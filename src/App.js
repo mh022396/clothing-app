@@ -1,24 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import Home from "./routes/home/home.component";
+import {Routes, Route} from 'react-router-dom';
+import Navigation from "./routes/navigation/navigation.component";
+import Authentication from "./routes/authentication/authentication.component";
+import Shop from "./routes/shop/shop.component";
+import Checkout from "./routes/checkout/checkout.component";
 
-function App() {
+import { useEffect } from "react";
+import { onAuthStateChangedListener, signOutUser, createUserDocumentFromAuth } from "./utils/firebase/firebase.utils";
+import { setCurrentUser } from "./store/user/user.action";
+import { useDispatch } from "react-redux";
+
+ const App = () => {
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    //called when mounting
+    const unsub = onAuthStateChangedListener((user) => {//user will be the auth value in 
+        if(user){
+            createUserDocumentFromAuth(user);//creates doc on firebase if it doesnt already exist for user
+        }
+        dispatch(setCurrentUser(user)); //This component and its children are rendered again with the change of state
+    });
+
+    // will run this unsubscribe function call back on unmount
+    return unsub;
+  }, [dispatch]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route path='/' element={<Navigation />}>
+        <Route index element={<Home />}/>
+        {/* Shop will have its own routes */}
+        <Route path='shop/*' element={<Shop />}/>
+        <Route path='auth' element={<Authentication />}/>
+        <Route path='checkout' element= {<Checkout />} />
+      </Route>
+    </Routes>
   );
 }
 

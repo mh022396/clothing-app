@@ -1,0 +1,8 @@
+.products-container{
+    display: grid;
+    // 4 columns each column item taking up 1 free space
+    grid-template-columns: repeat(4, 1fr);
+    column-gap: 10px;
+    row-gap: 50px;
+    margin: 20px auto ;
+}
